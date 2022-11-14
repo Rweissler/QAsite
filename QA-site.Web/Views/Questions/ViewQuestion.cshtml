@@ -1,0 +1,78 @@
+﻿@model ViewQuestionViewModel
+<div class="row">
+    <div class="col-md-8 offset-md-2 jumbotron">
+        <h2>@Model.Question.Title</h2>
+        <hr />
+        <p>@Model.Question.Text</p>
+        <hr />
+        <span>Asked by @Model.Question.User.Name</span>
+        on
+        <span>@Model.Question.Date.ToLongDateString()</span>
+        <br />
+        <span>Tags:</span>
+        @foreach (var questionTag in Model.Question.QuestionTags)
+        {
+            <span class="badge badge-primary">@questionTag.Tag.Name</span>
+        }
+
+        <br />
+        <span>Likes: </span> <span id="likes-count">@Model.Question.Likes.Count</span>
+        <br />
+        @if (User.Identity.IsAuthenticated)
+        {
+            <span style="font-size: 40px;cursor: pointer;" class="oi oi-heart @(Model.LikedQuestion ? "text-danger" : "")" id="like-question" data-question-id="@Model.Question.ID">
+            </span>
+        }
+        <input type="hidden" id="question-id" value="@Model.Question.ID" />
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <h3>Answers:</h3>
+    </div>
+</div>
+@if (Model.Question.Answers.Count == 0)
+{
+    <div class="row">
+        <div class="col-md-8 offset-md-2 card card-body bg-light">
+            <h3>No answers yet @(Model.IsAuthenticated ? ", be the first to submit one!" : "")</h3>
+        </div>
+    </div>
+}
+else
+{
+    @foreach (var answer in Model.Question.Answers)
+    {
+        <div class="row">
+            <div class="col-md-8 offset-md-2 card card-body bg-light">
+                <div>@answer.Text</div>
+                <br />
+                <span>Answered by @answer.User.Name</span>
+                <span>on</span>
+                <span>@answer.Date.ToLongDateString()</span>
+                <hr />
+            </div>
+        </div>
+    }
+}
+
+
+
+@if (Model.IsAuthenticated)
+{
+    <div class="row">
+        <div class="col-md-8 offset-md-2 card card-body bg-light mt-4">
+            <h2>Submit an answer</h2>
+            <form method="post" action="/questions/addanswer">
+                <input type="hidden" name="questionid" value="@Model.Question.ID" />
+                <textarea class="form-control" placeholder="Type your answer here..." rows="10" name="text"></textarea>
+                <br />
+                <button class="btn btn-primary">Submit</button>
+            </form>
+        </div>
+    </div>
+}
+
+@section Scripts{
+    <script src="~/js/view-question.js"></script>
+}
